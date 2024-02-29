@@ -1,26 +1,28 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import './index.css';
+import Chat from './pages/Chat';
+import { Provider } from 'react-redux';
+import store from './app/store';
+import axios from 'axios';
+import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
+import NotFoundPage from './pages/404';
+import Start from './pages/Start';
 
-function App() {
+const App = () => {
+  axios.defaults.baseURL = process.env.REACT_APP_BASE_URL + 'api/';
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <>
+      <Provider store={store}>
+        <Router>
+          <Routes>
+            <Route path='/' element={<Chat />} />
+            <Route path='start' element={<Start />} />
+            <Route path='/404' element={<NotFoundPage />} />
+          </Routes>
+        </Router>
+      </Provider>
+    </>
   );
-}
+};
 
 export default App;
