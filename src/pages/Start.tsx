@@ -17,6 +17,8 @@ const Start = () => {
       'channel',
     );
 
+    console.log('channelQuery', channelQuery);
+
     if (!channelQuery) {
       alert('Please enter a channel name');
     }

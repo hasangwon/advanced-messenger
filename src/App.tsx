@@ -6,6 +6,8 @@ import axios from 'axios';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import NotFoundPage from './pages/404';
 import Start from './pages/Start';
+import Login from './pages/Login';
+import Admin from './pages/Admin';
 
 const App = () => {
   axios.defaults.baseURL = process.env.REACT_APP_BASE_URL + 'api/';
@@ -18,6 +20,8 @@ const App = () => {
             <Route path='/' element={<Chat />} />
             <Route path='start' element={<Start />} />
             <Route path='/404' element={<NotFoundPage />} />
+            <Route path='/login' element={<Login />} />
+            <Route path='/admin' element={<Admin />} />
           </Routes>
         </Router>
       </Provider>

@@ -7,8 +7,10 @@ body {
   width: 100%;
   padding: 0;
   margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen,
-    Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue, sans-serif;
+  font-family: 'Nanum Gothic', sans-serif;
+  font-size: 16px;
+  line-height: 1.5;
+  letter-spacing: -0.02rem;
 }
 
 .font-Nanum {
@@ -71,11 +73,6 @@ textarea::-webkit-textarea-placeholder {
   letter-spacing: -0.1125rem;
 }
 
-
-.textAreaShadow {
-  box-shadow: 0 -1px 7px 0px rgba(0, 0, 0, 0.1);
-}
-
 .textarea::placeholder {
   letter-spacing: 0;
   font-size: 0.875rem;
@@ -94,81 +91,8 @@ span.ripple {
     opacity: 0;
   }
 }
-.removeHighlight {
-  -webkit-tap-highlight-color: transparent;
-  -webkit-touch-callout: none;
-  -webkit-user-select: none;
-  -khtml-user-select: none;
-  -moz-user-select: none;
-  -ms-user-select: none;
-  user-select: none;
-}
-.removeHighlight:focus {
-  outline: none !important;
-}
-.removeIOSInputRound {
-  -webkit-appearance: none;
-  -webkit-border-radius: 0;
-}
-.dot-flashing {
-  position: relative;
-  width: 8px;
-  height: 8px;
-  border-radius: 4px;
-  background-color: #6c5ce7;
-  color: #6c5ce7;
-  animation: dot-flashing 1s infinite linear alternate;
-  animation-delay: 0.5s;
-}
-.dot-flashing::before,
-.dot-flashing::after {
-  content: '';
-  display: inline-block;
-  position: absolute;
-  top: 0;
-}
-.dot-flashing::before {
-  left: -12px;
-  width: 8px;
-  height: 8px;
-  border-radius: 4px;
-  background-color: #6c5ce7;
-  color: #6c5ce7;
-  animation: dot-flashing 1s infinite alternate;
-  animation-delay: 0s;
-}
-.dot-flashing::after {
-  left: 12px;
-  width: 8px;
-  height: 8px;
-  border-radius: 4px;
-  background-color: #6c5ce7;
-  color: #6c5ce7;
-  animation: dot-flashing 1s infinite alternate;
-  animation-delay: 1s;
-}
 
-@keyframes dot-flashing {
-  0% {
-    background-color: #6c5ce7;
-  }
-  50%,
-  100% {
-    background-color: rgba(152, 128, 255, 0.2);
-  }
-}
-.chatViewMain {
-  scroll-behavior: smooth;
-}
-
-.right .chattingModule > span {
-  display: flex !important;
-  justify-content: flex-end !important;
-  width: 100% !important;
-}
-
-.left .chattingModule > span {
-  display: flex !important;
-  justify-content: flex-start !important;
-  width: 100% !important;
+#root {
+  width: 100%;
+  height: 100%;
 }
