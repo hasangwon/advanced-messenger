@@ -1,13 +1,16 @@
 import dayjs from 'dayjs';
 import firebase from 'firebase';
 import React, { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
+import { displayDomain } from '../utils/displayDomain';
+import QrCodeComponent from '../utils/QrCodeComponent';
 
 const Admin = () => {
   const navigate = useNavigate();
   const [userEmail, setUserEmail] = useState(''); // 사용자 이메일 상태
   const [channelKey, setChannelKey] = useState(''); // 채널 키 상태
   const [chatList, setChatList] = useState([]); // 채팅 목록 상태
+  const [selectedChat, setSelectedChat] = useState(''); // 선택된 채팅 상태
 
   useEffect(() => {
     const unsubscribe = firebase.auth().onAuthStateChanged((user) => {
@@ -35,6 +38,7 @@ const Admin = () => {
           doc.forEach((doc) => {
             console.log(doc.data().key, 'asd');
             setChannelKey(doc.data().key);
+            setSelectedChat('');
           });
         })
         .catch((err) => {
@@ -59,43 +63,93 @@ const Admin = () => {
         });
     }
   }, [channelKey]);
-  console.log(userEmail, 'ad');
 
   return (
     <div className='w-full h-full'>
-      <div className='flex justify-between p-4 border border-green-300 border-t-0 border-l-0 border-r-0 border-b-[1px]'>
-        <h1 className='mb-2 text-xl font-semibold text-green-600'>채팅</h1>
-        <button
-          className='text-green-300 text-sm'
-          onClick={() => {
-            firebase.auth().signOut();
-            navigate('/login');
-          }}
-        >
-          로그아웃
-        </button>
+      <div className='flex justify-between p-4 border border-gray-300 border-t-0 border-l-0 border-r-0 border-b-[1px]'>
+        {selectedChat ? (
+          <button
+            className='text-gray-400 text-sm'
+            onClick={() => {
+              navigate('/admin');
+              setSelectedChat('');
+            }}
+          >
+            뒤로가기
+          </button>
+        ) : (
+          <button
+            className='text-gray-400 text-sm'
+            onClick={() => {
+              firebase.auth().signOut();
+              navigate('/login');
+            }}
+          >
+            로그아웃
+          </button>
+        )}
+
+        <h1 className='mb-2 text-xl font-semibold text-gray-600 flex items-center'>
+          채팅
+        </h1>
+        <div className='pb-2 flex text-xs items-center'>
+          <div className='mr-4'>
+            {QrCodeComponent(displayDomain(channelKey))}
+          </div>
+          <div className='flex flex-col'>
+            <span className='mb-1'>상담 주소 공유</span>
+            <button
+              onClick={() => {
+                console.log(displayDomain(channelKey));
+                navigator.clipboard.writeText(
+                  displayDomain(channelKey).toString(),
+                );
+              }}
+              className='border p-2'
+            >
+              주소 복사
+            </button>
+          </div>
+        </div>
       </div>
 
+      <button
+        onClick={() => {
+          navigate('/admin');
+        }}
+      >
+        asd
+      </button>
       <div className='p-2 overflow-y-auto h-[calc(100%-5rem)]'>
-        {chatList.map((chat) => (
-          <div
-            key={chat.key}
-            className='w-full h-20 border border-green-300 rounded-md mb-2'
-          >
-            <div className='w-full h-full flex items-center px-4'>
-              <div className='flex-1'>
-                이름 : <b>{chat.name}</b>
-              </div>
-              <div className='flex-1 text-sm'>
-                최근 메시지 :{' '}
-                {chat?.recentMessage ? chat.recentMessage : '없음'}
-              </div>
-              <div className='flex-1 text-sm'>
-                생성일 : {dayjs(chat.createdDate).format('YYYY-MM-DD')}
-              </div>
-            </div>
+        {selectedChat ? (
+          <div>{selectedChat}</div>
+        ) : (
+          <div>
+            {chatList.map((chat) => (
+              <button
+                onClick={() => {
+                  setSelectedChat(chat.key);
+                  navigate(`/admin?chat=${chat.key}`);
+                }}
+                key={chat.key}
+                className='w-full h-20 border border-gray-300 bg-gray-400 text-white rounded-md mb-2'
+              >
+                <div className='w-full h-full flex items-center px-4'>
+                  <div className='flex-1'>
+                    이름 : <b>{chat.name}</b>
+                  </div>
+                  <div className='flex-1 text-sm'>
+                    최근 메시지 :{' '}
+                    {chat?.recentMessage ? chat.recentMessage : '없음'}
+                  </div>
+                  <div className='flex-1 text-sm'>
+                    생성일 : {dayjs(chat.createdDate).format('YYYY-MM-DD')}
+                  </div>
+                </div>
+              </button>
+            ))}
           </div>
-        ))}
+        )}
       </div>
     </div>
   );
