@@ -4,13 +4,23 @@ import React, { useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { displayDomain } from '../utils/displayDomain';
 import QrCodeComponent from '../utils/QrCodeComponent';
+import ChattingTextBox from '../components/chat/ChattingTextBox';
+import ChattingBoxModule from '../components/chat/ChattingBoxModule';
 
 const Admin = () => {
+  const location = useLocation();
+  useEffect(() => {
+    console.log(location.search, 'location');
+    setChannelKey(new URLSearchParams(location.search).get('channel'));
+    setSelectedChat(new URLSearchParams(location.search).get('chat'));
+  }, [location]);
+
   const navigate = useNavigate();
   const [userEmail, setUserEmail] = useState(''); // 사용자 이메일 상태
   const [channelKey, setChannelKey] = useState(''); // 채널 키 상태
   const [chatList, setChatList] = useState([]); // 채팅 목록 상태
   const [selectedChat, setSelectedChat] = useState(''); // 선택된 채팅 상태
+  const [messageList, setMessageList] = useState([]); // 메시지 목록 상태
 
   useEffect(() => {
     const unsubscribe = firebase.auth().onAuthStateChanged((user) => {
@@ -64,6 +74,25 @@ const Admin = () => {
     }
   }, [channelKey]);
 
+  useEffect(() => {
+    if (channelKey && selectedChat) {
+      firebase
+        .firestore()
+        .collection('Channel')
+        .doc(channelKey)
+        .collection('Chat')
+        .doc(selectedChat)
+        .collection('Message')
+        .orderBy('createdDate', 'desc')
+        .onSnapshot((snapshot) => {
+          console.log(snapshot.docs.map((doc) => doc.data()));
+          const sortedMessageList = snapshot.docs
+            .map((doc) => doc.data())
+            .sort((a, b) => a.createdDate - b.createdDate);
+        });
+    }
+  }, [selectedChat]);
+
   return (
     <div className='w-full h-full'>
       <div className='flex justify-between p-4 border border-gray-300 border-t-0 border-l-0 border-r-0 border-b-[1px]'>
@@ -113,16 +142,17 @@ const Admin = () => {
         </div>
       </div>
 
-      <button
-        onClick={() => {
-          navigate('/admin');
-        }}
-      >
-        asd
-      </button>
       <div className='p-2 overflow-y-auto h-[calc(100%-5rem)]'>
         {selectedChat ? (
-          <div>{selectedChat}</div>
+          <div>
+            {/* {selectedChat} */}
+            <ChattingBoxModule
+              hospitalName={'나'}
+              messageList={[]}
+              isLoaded={true}
+            />
+            <ChattingTextBox addChatMessage={() => {}} />
+          </div>
         ) : (
           <div>
             {chatList.map((chat) => (
