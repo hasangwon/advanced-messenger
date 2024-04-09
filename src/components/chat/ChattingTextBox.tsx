@@ -21,9 +21,6 @@ const ChattingTextBox = ({ addChatMessage }) => {
       hiddenInputRef.current.focus();
       addChatMessage(currentChat);
     }
-    // else {
-    //   alert('입력한 메시지가 없습니다.');
-    // }
   };
 
   const handleEnterPress: KeyboardEventHandler<

@@ -19,7 +19,7 @@ export interface TimerInterface {
 }
 
 export interface InfosInterface {
-  hospitalKey: string;
-  hospitalName: string;
-  hospitalTelNumber: string;
+  userKey: string;
+  userName: string;
+  userTelNumber: string;
 }

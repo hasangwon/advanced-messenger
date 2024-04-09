@@ -14,14 +14,14 @@ export const globalSlice = createSlice({
       state.config.isLoaded = action.payload;
     },
 
-    setInfoHospitalKey: (state, action: PayloadAction<string>) => {
-      state.info.hospitalKey = action.payload;
+    setInfoUserKey: (state, action: PayloadAction<string>) => {
+      state.info.userKey = action.payload;
     },
-    setInfoHospitalName: (state, action: PayloadAction<string>) => {
-      state.info.hospitalName = action.payload;
+    setInfoUserName: (state, action: PayloadAction<string>) => {
+      state.info.userName = action.payload;
     },
-    setInfoHospitalTelNumber: (state, action: PayloadAction<string>) => {
-      state.info.hospitalTelNumber = action.payload;
+    setInfoUserTelNumber: (state, action: PayloadAction<string>) => {
+      state.info.userTelNumber = action.payload;
     },
   },
 });

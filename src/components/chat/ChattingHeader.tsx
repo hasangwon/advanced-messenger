@@ -1,27 +1,26 @@
 import React, { useCallback } from 'react';
 
-import { getAge } from '../../utils/getAge';
 type ChattingHeaderProps = {
-  hospitalName: string;
-  hospitalTelNumber: string;
-  petInfo: { petName: string; petSpecies: string; petBirthDate: number };
+  userName: string;
+  userTelNumber: string;
+  chatName: string;
 };
 const ChattingHeader: React.FC<ChattingHeaderProps> = ({
-  hospitalName = '병원 정보 없음',
-  hospitalTelNumber,
-  petInfo,
+  userName = '유저 정보 없음',
+  userTelNumber,
+  chatName,
 }) => {
-  const handleCallHospital = useCallback(
-    (event: React.MouseEvent<HTMLButtonElement>) => {
-      event.preventDefault();
-      if (hospitalTelNumber) {
-        window.location.href = `tel:${hospitalTelNumber}`;
-      } else {
-        alert('등록된 병원 전화번호가 없습니다.');
-      }
-    },
-    [hospitalTelNumber],
-  );
+  // const handleCallUser = useCallback(
+  //   (event: React.MouseEvent<HTMLButtonElement>) => {
+  //     event.preventDefault();
+  //     if (userTelNumber) {
+  //       window.location.href = `tel:${userTelNumber}`;
+  //     } else {
+  //       alert('등록된 유저 전화번호가 없습니다.');
+  //     }
+  //   },
+  //   [userTelNumber],
+  // );
 
   return (
     <div className={'w-full'}>
@@ -30,41 +29,21 @@ const ChattingHeader: React.FC<ChattingHeaderProps> = ({
           <div className=''>
             <div className='flex items-center mb-[-.25rem]'>
               <span className='font-bold text-lg'>
-                {hospitalName
-                  ? hospitalName.length > 10
-                    ? `${hospitalName.slice(0, 10)}..`
-                    : hospitalName
+                {userName
+                  ? userName.length > 10
+                    ? `${userName.slice(0, 10)}..`
+                    : userName
                   : ''}
               </span>
             </div>
             <span className='text-sm text-neutral-normal font-semibold whitespace-nowrap'>
-              {petInfo
-                ? `${
-                    petInfo.petName
-                      ? petInfo.petName.length > 4
-                        ? `${petInfo.petName.slice(0, 4)}..`
-                        : petInfo.petName
-                      : '-'
-                  }${
-                    petInfo?.petSpecies
-                      ? petInfo.petSpecies === 'dog'
-                        ? '/ 강아지'
-                        : petInfo.petSpecies === 'cat'
-                          ? '/ 고양이'
-                          : '/ 기타'
-                      : ''
-                  } ${
-                    petInfo.petBirthDate
-                      ? `/ ${getAge(petInfo.petBirthDate)}`
-                      : ''
-                  }`
-                : '입력된 정보가 없습니다.'}
+              {chatName ? chatName : '정보 없음'}
             </span>
           </div>
-          <div className='whitespace-nowrap'>
+          {/* <div className='whitespace-nowrap'>
             <button
               className='bg-[#FFF4E5] rounded-full p-2'
-              onClick={handleCallHospital}
+              onClick={handleCallUser}
             >
               <svg
                 xmlns='http://www.w3.org/2000/svg'
@@ -82,7 +61,7 @@ const ChattingHeader: React.FC<ChattingHeaderProps> = ({
                 />
               </svg>
             </button>
-          </div>
+          </div> */}
         </div>
       </div>
     </div>

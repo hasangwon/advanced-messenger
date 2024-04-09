@@ -6,15 +6,25 @@ import ChattingBoxModule from '../components/chat/ChattingBoxModule';
 import ChattingTextBox from '../components/chat/ChattingTextBox';
 import { useNavigate } from 'react-router-dom';
 
-import { db } from '../firebase';
+import { addChatMessage, getChatInfo } from '../service/ChattingService';
+import firebase from 'firebase';
 
 const Chat = () => {
   const navigate = useNavigate();
-
-  const [channelInfo, setChannelInfo] = useState(null);
   const [messages, setMessages] = useState([]);
-  const [hospitalName, setHospitalName] = useState('');
   const [chatName, setChatName] = useState('');
+  const [channelKey, setChannelKey] = useState('');
+  const [selectedChat, setSelectedChat] = useState('');
+
+  const sendMessage = (inputMessage) => {
+    addChatMessage(
+      channelKey,
+      selectedChat,
+      'customer',
+      inputMessage,
+      chatName || '유저',
+    );
+  };
 
   useEffect(() => {
     const channelQuery = new URLSearchParams(window.location.search).get(
@@ -23,122 +33,88 @@ const Chat = () => {
     const chatQuery = new URLSearchParams(window.location.search).get('chat');
     const storage = window.localStorage;
     const localInfo = storage.getItem('savedChat');
-    console.log('nice', localInfo);
+    setChannelKey(channelQuery);
+    setSelectedChat(chatQuery);
+
+    // 채널 쿼리 없을 시, 기본 페이지로 이동
     if (!channelQuery) {
-      navigate('/404');
-    } else if (!chatQuery) {
+      navigate('/admin');
+    }
+    // 챗 쿼리가 없을 시, 로컬 스토리지 확인
+    else if (!chatQuery) {
       const infos = localInfo ? localInfo.split('/') : [null, null];
+      // 일치하는 채널 쿼리 있을 시, 이동
       if (infos[0] && infos[0] === channelQuery) {
         navigate(`/?channel=${channelQuery}&chat=${infos[1]}`);
-      } else {
+      }
+      // 일치하는 채널 쿼리 없을 시, 신규 생성으로 이동
+      else {
         navigate(`/start/?channel=${channelQuery}`);
       }
-    } else {
-      db.collection('Channel')
-        .doc(channelQuery)
-        .collection('Chat')
-        .doc(chatQuery || '')
-        .get()
-        .then((doc) => {
-          if (doc.exists) {
-            console.log(doc.data());
-            setChatName(doc.data().name);
-            navigate(`/?channel=${channelQuery}&chat=${doc.data().key}`);
-            storage.setItem('savedChat', `${channelQuery}/${doc.data().key}`);
-          } else {
-            navigate(`/start/?channel=${channelQuery}`);
-          }
-        });
+    }
+    // 채널, 챗 쿼리 모두 있을 시, 챗 정보 가져옴
+    else {
+      getChatInfo(channelQuery, chatQuery).then((chatInfo) => {
+        if (chatInfo) {
+          setChatName(chatInfo.name);
+          navigate(`/?channel=${channelQuery}&chat=${chatQuery}`);
+          storage.setItem('savedChat', `${channelQuery}/${chatQuery}`);
+        } else {
+          navigate(`/start/?channel=${channelQuery}`);
+        }
+      });
     }
   }, []);
 
-  const sendMessage = (inputMessage) => {
-    console.log(inputMessage);
-  };
-
   useEffect(() => {
-    db.collection('Channel')
-      .get()
-      .then((doc) => {
-        doc.forEach((doc) => {
-          console.log(doc.data());
+    let unsubscribe;
+    if (channelKey && selectedChat) {
+      unsubscribe = firebase
+        .firestore()
+        .collection('Channel')
+        .doc(channelKey)
+        .collection('Chat')
+        .doc(selectedChat)
+        .collection('Message')
+        .orderBy('createdDate', 'desc')
+        .onSnapshot((snapshot) => {
+          console.log(snapshot.docs.map((doc) => doc.data()));
+          const sortedMessageList = snapshot.docs
+            .map((doc) => doc.data())
+            .sort((a, b) => a.createdDate - b.createdDate);
+          setMessages(sortedMessageList);
         });
-      })
-      .catch((error) => {
-        console.log(error);
-      });
-  }, []);
+    }
 
-  // const [isShownViewerPopup, setShownViewerPopup] = useState(false);
-  // const [selectMessageData, setSelectMessageData] = useState({
-  //   mediaType: 0,
-  //   link: '',
-  // });
-  // const viewerContentsRef = useRef(null);
-  // const imageViewRef = useRef(null);
+    return () => {
+      if (unsubscribe) {
+        unsubscribe();
+      }
+    };
+  }, [channelKey, selectedChat]);
+
   return (
     <>
       <Helmet>
-        <title>{channelInfo?.name || '간편상담'}</title>
+        <title>{'간편상담'}</title>
         <link rel='icon' type='image/ico' href='/favicon.ico' sizes='96x96' />
       </Helmet>
       <div className='flex flex-col fixed bottom-0 bg-white w-full h-full'>
-        {/* {isShownViewerPopup && selectMessageData.link && (
-        <div
-          ref={viewerContentsRef}
-          className='flex justify-center items-center fixed z-[200] w-full h-full bg-[#00000045]'
-        >
-          {selectMessageData.mediaType === 0 ? (
-            <div
-              ref={imageViewRef}
-              className='flex w-full justify-center items-center'
-            >
-              <img
-                className='w-full bg-white'
-                src={selectMessageData.link}
-                alt='image_viewer'
-              />
-            </div>
-          ) : (
-            <div>
-              <ReactPlayer
-                className='absolute left-[50%] top-[50%] bg-black translate-x-[-50%] translate-y-[-50%]'
-                url={selectMessageData.link}
-                playing={true}
-                controls={true}
-                muted={true}
-                width={'100%'}
-              />
-            </div>
-          )}
-        </div>
-      )} */}
-
         <ChattingHeader
-          hospitalName={channelInfo?.name || '간편상담'}
-          hospitalTelNumber={'01012345678'}
-          petInfo={{
-            petName: chatName,
-            petSpecies: '',
-            petBirthDate: 0,
-          }}
+          userName={'간편상담'}
+          userTelNumber={'01012345678'}
+          chatName={chatName}
         />
         <ChattingBoxModule
-          hospitalName={hospitalName}
           messageList={messages}
           isLoaded={true}
+          userName={chatName}
         />
         <ChattingTextBox
           addChatMessage={(message) => {
             sendMessage(message);
           }}
         />
-
-        {/* <AnimatePresence>
-        {isShownAgreement && (
-          <AgreementModal onClickAgreement={onClickAgreement} />
-        )}
-      </AnimatePresence> */}
       </div>
     </>
   );

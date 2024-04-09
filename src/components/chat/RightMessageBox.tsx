@@ -3,16 +3,10 @@ import React from 'react';
 import ImageBox from '../common/ImageBox';
 import VideoBox from '../common/VideoBox';
 import FileBox from '../common/FileBox';
-import { messageComponentType } from './messageType';
 import Linkify from '../../utils/Linkify';
 import { Time } from './Time';
 
-const RightMessageBox = ({
-  preMsgCard,
-  msgCard,
-  nextMsgCard,
-  read,
-}: messageComponentType) => {
+const RightMessageBox = ({ preMsgCard, msgCard, nextMsgCard, read }) => {
   const handleClickWindowEvent = {
     messageClick: () => {
       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
@@ -44,45 +38,7 @@ const RightMessageBox = ({
                   ' text-neutral-dark'
                 }
               >
-                {msgCard.images &&
-                  msgCard.images.map((msgObject) => {
-                    return (
-                      <ImageBox
-                        key={msgObject.link}
-                        isLeft={false}
-                        imageUrl={msgObject.link}
-                        onClick={handleClickWindowEvent.messageClick}
-                      />
-                    );
-                  })}
-                {msgCard.videos &&
-                  msgCard.videos.map((msgObject) => {
-                    return (
-                      <VideoBox
-                        key={msgObject.link}
-                        video={msgObject}
-                        onClick={handleClickWindowEvent.messageClick}
-                      />
-                    );
-                  })}
-                {msgCard.files &&
-                  msgCard.files.map((msgObject) => {
-                    return (
-                      <FileBox
-                        key={msgObject.link}
-                        isLeft={false}
-                        file={msgObject}
-                        onClick={handleClickWindowEvent.messageClick}
-                      />
-                    );
-                  })}
-                {msgCard.videos || msgCard.images ? (
-                  ''
-                ) : (
-                  <button className={'text-left text-sm text-neutral-dark'}>
-                    <Linkify text={msgCard.content} />
-                  </button>
-                )}
+                {msgCard.text}
               </ul>
             </div>
             {read && (
@@ -109,10 +65,7 @@ const RightMessageBox = ({
   );
 };
 
-const areEqual = (
-  prevProps: messageComponentType,
-  nextProps: messageComponentType,
-) => {
+const areEqual = (prevProps, nextProps) => {
   return _.isEqual(prevProps, nextProps);
 };
 

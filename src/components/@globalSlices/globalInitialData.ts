@@ -10,9 +10,9 @@ const initialState: GlobalTypes = {
     isLoaded: true,
   },
   info: {
-    hospitalKey: '123123',
-    hospitalName: '상원병원',
-    hospitalTelNumber: '01098743299',
+    userKey: '1',
+    userName: '유저',
+    userTelNumber: '',
   },
 };
 
